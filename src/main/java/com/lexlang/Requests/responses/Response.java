@@ -71,12 +71,8 @@ public class Response {
 	private String inputStream2String(InputStream inputStream,String decode) throws IOException{
         // 定义 BufferedReader输入流来读取URL的响应，设置utf8防止中文乱码
         String result = "";
-        BufferedReader in = null;
-        if(decode!=null){
-        	in = new BufferedReader(new InputStreamReader(inputStream, decode));
-        }else{
-        	in = new BufferedReader(new InputStreamReader(inputStream, "utf-8"));
-        }
+        BufferedReader in = new BufferedReader(new InputStreamReader(inputStream, decode));
+
         String line;
         while ((line = in.readLine()) != null) {
             result += line;
@@ -117,7 +113,20 @@ public class Response {
 	 * @return
 	 */
 	public String getContent(){
-		try {return inputStream2String(new ByteArrayInputStream(baos.toByteArray()), decode);} catch (IOException e) {System.out.println("流转字符串发生错误");}
+		try {
+			if(decode!=null){
+				return inputStream2String(new ByteArrayInputStream(baos.toByteArray()), decode);
+			}else{
+				String[] decs={"utf-8","gbk","gb2312"};
+				for(String dec:decs){
+					String con=inputStream2String(new ByteArrayInputStream(baos.toByteArray()), dec);
+					if(! isMessyCode(con)){
+						return con;
+					}
+				}
+				return inputStream2String(new ByteArrayInputStream(baos.toByteArray()), "utf-8");
+			}
+		} catch (IOException e) {System.out.println("流转字符串发生错误");}
 		return "";
 	}
 	
@@ -228,5 +237,49 @@ public class Response {
 		return baos;
 	}
     
-	
+    
+    /** 
+     * 判断字符串是否是乱码 
+     * 
+     * @param strName 字符串 
+     * @return 是否是乱码 
+     */  
+    private static boolean isMessyCode(String strName) {  
+        Pattern p = Pattern.compile("\\s*|t*|r*|n*");  
+        Matcher m = p.matcher(strName);  
+        String after = m.replaceAll("");  
+        String temp = after.replaceAll("\\p{P}", "");  
+        char[] ch = temp.trim().toCharArray();  
+        float chLength = ch.length;  
+        float count = 0;  
+        for (int i = 0; i < ch.length; i++) {  
+            char c = ch[i];  
+            if (!Character.isLetterOrDigit(c)) {  
+                if (!isChinese(c)) {  
+                    count = count + 1;  
+                }  
+            }  
+        }  
+        float result = count / chLength;  
+        if (result > 0.2) {  
+            return true;  
+        } else {  
+            return false;  
+        }  
+   
+    }  
+    
+    private static boolean isChinese(char c) {  
+        Character.UnicodeBlock ub = Character.UnicodeBlock.of(c);  
+        if (ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS  
+                || ub == Character.UnicodeBlock.CJK_COMPATIBILITY_IDEOGRAPHS  
+                || ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A  
+                || ub == Character.UnicodeBlock.GENERAL_PUNCTUATION  
+                || ub == Character.UnicodeBlock.CJK_SYMBOLS_AND_PUNCTUATION  
+                || ub == Character.UnicodeBlock.HALFWIDTH_AND_FULLWIDTH_FORMS) {  
+            return true;  
+        }  
+        return false;  
+    } 
+
 }
