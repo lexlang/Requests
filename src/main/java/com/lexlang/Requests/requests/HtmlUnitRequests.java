@@ -135,7 +135,7 @@ public class HtmlUnitRequests  extends Request{
 		webClient.getOptions().setJavaScriptEnabled(true);
 		WebRequest webGet=new WebRequest(new URL(url),HttpMethod.GET);
 		setHeader(webGet,headers);
-		return request(webGet,false,decode);
+		return request(webGet,decode);
 	}
 
 	@Override
@@ -156,7 +156,7 @@ public class HtmlUnitRequests  extends Request{
 		WebRequest webPost=new WebRequest(new URL(url),HttpMethod.POST);
 		setHeader(webPost,headers);
 		webPost.setRequestBody(data);
-		return request(webPost,false,decode);
+		return request(webPost,decode);
 	}
 	
 	@Override
@@ -175,7 +175,7 @@ public class HtmlUnitRequests  extends Request{
 		webClient.getOptions().setJavaScriptEnabled(false);
 		WebRequest webGet=new WebRequest(new URL(url),HttpMethod.GET);
 		setHeader(webGet,headers);
-		return request(webGet,false,decode);
+		return request(webGet,decode);
 	}
 	
 	@Override
@@ -195,7 +195,7 @@ public class HtmlUnitRequests  extends Request{
 		WebRequest webPost=new WebRequest(new URL(url),HttpMethod.POST);
 		setHeader(webPost,headers);
 		webPost.setRequestBody(data);
-		return request(webPost,false,decode);
+		return request(webPost,decode);
 	}
 	
 	@Override
@@ -210,11 +210,10 @@ public class HtmlUnitRequests  extends Request{
 	
 	@Override
 	public Response getUseHeaderAndDecodeAjax(String url,Map<String,String> headers,String decode) throws Exception{
-		String postJs = PostGetJS.postGetJS(url, "GET", headers, "")
-				.replace("return xmlhttp.responseText", "window.getContent=xmlhttp.responseText");
+		String postJs = PostGetJS.postGetJS(url, "GET", headers, "");
 		executeJavaScript(postJs);
 		String content=getHtmlPage().executeJavaScript("window.getContent").getJavaScriptResult().toString();
-		JSONArray result=JSONArray.parseArray(getHtmlPage().executeJavaScript("window.getContent").getJavaScriptResult().toString());
+		JSONArray result=JSONArray.parseArray(getHtmlPage().executeJavaScript("window.getHeader").getJavaScriptResult().toString());
 		List<NameValuePair> hd=new ArrayList<NameValuePair>();
 		for(int index=0;index<result.size();index++){
 			JSONObject item = result.getJSONObject(index);
@@ -223,7 +222,8 @@ public class HtmlUnitRequests  extends Request{
 				hd.add(new NameValuePair(key,item.getString(key)));
 			}
 		}
-		return new Response(hd,new ByteArrayInputStream(content.getBytes("utf-8")),"utf-8",url,200);
+		int status=Integer.parseInt(getHtmlPage().executeJavaScript("window.getStatus").getJavaScriptResult().toString());
+		return new Response(hd,new ByteArrayInputStream(content.getBytes("utf-8")),"utf-8",url,status);
 	}
 	
 	@Override
@@ -238,11 +238,10 @@ public class HtmlUnitRequests  extends Request{
 	
 	@Override
 	public Response postUseHeaderAndDecodeAjax(String url,String data,Map<String,String> headers,String decode) throws Exception{
-		String postJs = PostGetJS.postGetJS(url, "POST", headers, data)
-						.replace("return xmlhttp.responseText", "window.getContent=xmlhttp.responseText");
+		String postJs = PostGetJS.postGetJS(url, "POST", headers, data);
 		executeJavaScript(postJs);
 		String content=getHtmlPage().executeJavaScript("window.getContent").getJavaScriptResult().toString();
-		JSONArray result=JSONArray.parseArray(getHtmlPage().executeJavaScript("window.getContent").getJavaScriptResult().toString());
+		JSONArray result=JSONArray.parseArray(getHtmlPage().executeJavaScript("window.getHeader").getJavaScriptResult().toString());
 		List<NameValuePair> hd=new ArrayList<NameValuePair>();
 		for(int index=0;index<result.size();index++){
 			JSONObject item = result.getJSONObject(index);
@@ -251,7 +250,8 @@ public class HtmlUnitRequests  extends Request{
 				hd.add(new NameValuePair(key,item.getString(key)));
 			}
 		}
-		return new Response(hd,new ByteArrayInputStream(content.getBytes("utf-8")),"utf-8",url,200);
+		int status=Integer.parseInt(getHtmlPage().executeJavaScript("window.getStatus").getJavaScriptResult().toString());
+		return new Response(hd,new ByteArrayInputStream(content.getBytes("utf-8")),"utf-8",url,status);
 	}
 	
 	public void clearAllCookies(){
@@ -319,59 +319,15 @@ public class HtmlUnitRequests  extends Request{
 		return sb.toString();
 	}
 	
-	private Response request(WebRequest request,boolean renderEnabled,String decode) throws FailingHttpStatusCodeException, IOException{
-		if(renderEnabled){
-			HtmlPage page=webClient.getPage(request);
-			webClient.waitForBackgroundJavaScript(RENDER_TIME);//等待页面渲染时长
-			return new Response(page.getWebResponse().getResponseHeaders(),new ByteArrayInputStream(page.asXml().getBytes("utf-8")),"utf-8",page.getUrl().toString(),page.getWebResponse().getStatusCode());
+	private Response request(WebRequest request,String decode) throws FailingHttpStatusCodeException, IOException{
+		Page page=webClient.getPage(request);
+		if(decode!=null){
+			return new Response(page.getWebResponse().getResponseHeaders(),page.getWebResponse().getContentAsStream(),null,page.getUrl().toString(),page.getWebResponse().getStatusCode());
 		}else{
-			Page page=webClient.getPage(request);
-			if(decode!=null){
-				return new Response(page.getWebResponse().getResponseHeaders(),page.getWebResponse().getContentAsStream(),null,page.getUrl().toString(),page.getWebResponse().getStatusCode());
-			}else{
-				return new Response(page.getWebResponse().getResponseHeaders(),page.getWebResponse().getContentAsStream(),decode,page.getUrl().toString(),page.getWebResponse().getStatusCode());
-			}
+			return new Response(page.getWebResponse().getResponseHeaders(),page.getWebResponse().getContentAsStream(),decode,page.getUrl().toString(),page.getWebResponse().getStatusCode());
 		}
 	}
 	
-	/**
-	 * 
-	 * @param url 上传url
-	 * @param dataMap 除了file之外的上传值
-	 * @param headers 消息头
-	 * @param files   文件相关的值    key:"uploadedfile", "1.txt", "text/plain", "utf-8"
-	 * @param renderEnabled 是否渲染
-	 * @param decode  解码方式
-	 * @param sleepTime 渲染时长
-	 * @return
-	 * @throws FailingHttpStatusCodeException
-	 * @throws IOException
-	 */
-	public Response postFile(String url,Map<String,String> dataMap,Map<String,String> headers,Map<String,File> files,boolean renderEnabled,String decode,int sleepTime) throws FailingHttpStatusCodeException, IOException{
-		WebRequest webPost=new WebRequest(new URL(url),HttpMethod.POST);
-		setHeader(webPost,headers);
-		webPost.setEncodingType(FormEncodingType.MULTIPART);
-		List<NameValuePair> list=new ArrayList<NameValuePair>();
-		
-		Set<String> keys = dataMap.keySet();
-		for(String key:keys){
-			list.add(new NameValuePair(key,dataMap.get(key)));
-		}
-		
-		//File file = File.createTempFile("temp", ".txt");//创建临时文件
-		Set<String> fileKeys=files.keySet();
-		for(String key:fileKeys){
-			// "uploadedfile",files.get(key), "1.txt", "text/plain", "utf-8"
-			// key值为 上传文件属性值，文件名，文件类型，文件编码方式，   中间用制表符隔开
-			String[] arr=key.split("\t");
-			list.add(new KeyDataPair(arr[0],files.get(key), arr[1], arr[2], arr[3]));
-		}
-		webPost.setRequestParameters(list);
-		return request(webPost,true,decode);
-	}
-	
-
-
 	private void setHeader(WebRequest request,Map<String,String> headers){
 		if(headers==null){return ;}
 		Set<String> keys = headers.keySet();
@@ -382,7 +338,6 @@ public class HtmlUnitRequests  extends Request{
 	
 	public HtmlPage getHtmlPage(){
 		HtmlPage page = (HtmlPage) webClient.getCurrentWindow().getEnclosedPage();
-		//page.executeJavaScript(sourceCode)
 		return page;
 	}
 	
@@ -451,7 +406,7 @@ public class HtmlUnitRequests  extends Request{
 	 * @return
 	 */
 	public WebClient getWetClient(){
-		return this.webClient;
+		return webClient;
 	}
 	
 	/**
