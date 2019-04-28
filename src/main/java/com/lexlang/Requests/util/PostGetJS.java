@@ -32,13 +32,14 @@ public class PostGetJS {
 				sb.append( "xmlhttp.setRequestHeader(\""+"content-type"+"\",\""+"application/x-www-form-urlencoded"+"\");\n");
 			}
 		}
-		sb.append("xmlhttp.send(\""+postData+"\");\n");
-		sb.append("window.getContent=xmlhttp.responseText;");
-		sb.append("var headers = request.getAllResponseHeaders();");
-		sb.append("var arr = headers.trim().split(/[\r\n]+/);");
-		sb.append("var hd =[];");
-		sb.append("arr.forEach(function (line) {var headerMap = {}; var parts = line.split(': ');var header = parts.shift();var value = parts.join(': ');headerMap[header] = value;hd.push(headerMap);});");
-		sb.append("window.getHeader=JSON.stringify(hd);");
+		sb.append("xmlhttp.send('"+postData+"');\n");
+		sb.append("window.getContent=xmlhttp.responseText;\n");
+		sb.append("var headers = xmlhttp.getAllResponseHeaders();\n");
+		sb.append("var arr = headers.trim().split(/[\\r\\n]+/);\n");
+		sb.append("var hd =[];\n");
+		sb.append("arr.forEach(function (line) {var headerMap = {}; var parts = line.split(': ');var header = parts.shift();var value = parts.join(': ');headerMap[header] = value;hd.push(headerMap);});\n");
+		sb.append("window.getHeader=JSON.stringify(hd);\n");
+		sb.append("window.getStatus=xmlhttp.status;");
 		return sb.toString();
 	}
 }
