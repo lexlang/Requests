@@ -1,5 +1,6 @@
 package com.lexlang.Requests.requests;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
@@ -106,15 +107,18 @@ public class URLRequests extends Request{
 	@Override
 	public Response postUseHeaderAndDecode(String url, String data, Map<String, String> headers, String decode) throws IOException {
 		HttpURLConnection conn = (HttpURLConnection) getConnection(url,headers);
+		conn.setRequestMethod("POST"); 
+		
 		// 发送POST请求必须设置如下两行
 		conn.setDoOutput(true);
 		conn.setDoInput(true);
-		// 获取URLConnection对象对应的输出流
-		PrintWriter out = new PrintWriter(conn.getOutputStream());
-        // 发送请求参数
-		out.print(data);
-        // flush输出流的缓冲
-        out.flush();
+		conn.setUseCaches(false);
+
+        DataOutputStream dos=new DataOutputStream(conn.getOutputStream());
+        dos.writeBytes(data);
+        dos.flush();
+        dos.close();
+        
         Map<String, List<String>> map = conn.getHeaderFields();
         return new Response(HsToList.turnHsToList(map),conn.getInputStream(),decode,url,conn.getResponseCode());
 	}
