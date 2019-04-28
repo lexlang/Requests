@@ -99,10 +99,19 @@ public class JsoupRequests extends Request {
 		return new Response(HsToList.turnHsToList(resp.multiHeaders()),new ByteArrayInputStream(resp.bodyAsBytes()),decode,url,resp.statusCode());
 	}
 	
-	
+	/**
+	 * json格式不支持
+	 * @param url
+	 * @param data
+	 * @param headers
+	 * @return
+	 * @throws IOException
+	 */
 	private org.jsoup.Connection.Response postResp(String url, String data,Map<String, String> headers) throws IOException{
-		Connection con=getConnection(url,headers).followRedirects(true).method(Method.POST);
-		con.data(data);
+		Connection con=getConnection(url,headers)
+				.followRedirects(true)
+				.method(Method.POST);
+		con.requestBody(data);
 		org.jsoup.Connection.Response resp = con.execute();
 		return resp;
 	}
