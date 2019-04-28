@@ -46,6 +46,7 @@ import org.apache.http.ssl.SSLContexts;
 import com.gargoylesoftware.htmlunit.util.NameValuePair;
 import com.lexlang.Requests.proxy.ProxyPara;
 import com.lexlang.Requests.responses.Response;
+import com.lexlang.Requests.util.UrlUtils;
 
 /**
 * @author lexlang
@@ -183,7 +184,6 @@ public class HttpClientRequests  extends Request {
 	public Response postUseHeaderAndDecode(String url, String data, Map<String, String> headers, String decode) throws ClientProtocolException, IOException, URISyntaxException {
 		HttpPost httpPost=new HttpPost();
 		httpPost.setURI(new URI(url));
-	
 		if(headers!=null){
 			Set<String> keys = headers.keySet();
 			for(String key:keys){
@@ -198,6 +198,24 @@ public class HttpClientRequests  extends Request {
 		httpPost.setEntity(new StringEntity(data));
 		
 		HttpResponse response = httpClient.execute(httpPost);
+		
+		//手工跳转
+		if(response.getStatusLine().getStatusCode()==301 || response.getStatusLine().getStatusCode()==302){
+			Header[] hds = response.getAllHeaders();
+			String location="";
+			for(int index=0;index<hds.length;index++){
+				Header item = hds[index];
+				if(item.getName().equals("Location")){
+					location=item.getValue();
+					break;
+				}
+			}
+			if(location.length()>0){
+				return get(UrlUtils.canonicalizeUrl(location, url));
+			}else{
+				new RuntimeException("statuscode为301或302未找到,对应的location");
+			}
+		}
 		
 		return new Response(turnHsToList(response.getAllHeaders()),response.getEntity().getContent(),decode,url,response.getStatusLine().getStatusCode());
 	}
@@ -277,57 +295,7 @@ public class HttpClientRequests  extends Request {
 		
 		return new Response(turnHsToList(response.getAllHeaders()),response.getEntity().getContent(),decode,url,response.getStatusLine().getStatusCode());
 	}
-	
-	/**
-	 * 
-	 * @param url        访问的链接
-	 * @param dataMap    提交key value值
-	 * @param headers    消息头
-	 * @param files      提交的文件 key值为 "uploadedfile", "1.txt", "text/plain", "utf-8"
-	 * @param decode     编码方式
-	 * @return
-	 * @throws ClientProtocolException
-	 * @throws IOException
-	 * @throws URISyntaxException
-	 */
-	public Response postFile(String url,Map<String,String> dataMap,Map<String,String> headers,Map<String,File> files,String decode) throws ClientProtocolException, IOException, URISyntaxException{
-		HttpPost httpPost=new HttpPost();
-		httpPost.setURI(new URI(url));
 		
-		if(headers!=null){
-			Set<String> keys = headers.keySet();
-			for(String key:keys){
-				httpPost.setHeader(key, headers.get(key));
-			}
-		}else{
-			//设置一个默认的post header
-			httpPost.setHeader("content-type", "application/x-www-form-urlencoded");
-		}
-		
-		MultipartEntityBuilder build = MultipartEntityBuilder.create();
-		
-		// 相当于<input type="file" name="file"/>
-		Set<String> keyFile = files.keySet();
-		for(String key:keyFile){
-			// "uploadedfile",files.get(key), "1.txt", "text/plain", "utf-8"
-			// key值为 上传文件属性值，文件名，文件类型，文件编码方式，   中间用制表符隔开
-			String[] arr=key.split("\t");
-			build.addBinaryBody(arr[0],files.get(key), ContentType.create(arr[2], Charset.forName(arr[3])), arr[1]);
-		}
-		
-		// 相当于<input type="text" name="userName" value=userName>
-		Set<String> keys=dataMap.keySet();
-		for(String key:keys){
-			build.addTextBody(key, dataMap.get(key), ContentType.create("text/plain", Charset.forName(decode)));
-		}
-		
-		httpPost.setEntity(build.build());
-	   
-		HttpResponse response = httpClient.execute(httpPost);
-		return new Response(turnHsToList(response.getAllHeaders()),response.getEntity().getContent(),decode,url,response.getStatusLine().getStatusCode());
-	}
-	
-	
     /** 
      * 绕过ssl验证 
      *   
