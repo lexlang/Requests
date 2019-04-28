@@ -135,7 +135,7 @@ public class HtmlUnitRequests  extends Request{
 		webClient.getOptions().setJavaScriptEnabled(true);
 		WebRequest webGet=new WebRequest(new URL(url),HttpMethod.GET);
 		setHeader(webGet,headers);
-		return request(webGet,true,decode);
+		return request(webGet,false,decode);
 	}
 
 	@Override
@@ -156,7 +156,7 @@ public class HtmlUnitRequests  extends Request{
 		WebRequest webPost=new WebRequest(new URL(url),HttpMethod.POST);
 		setHeader(webPost,headers);
 		webPost.setRequestBody(data);
-		return request(webPost,true,decode);
+		return request(webPost,false,decode);
 	}
 	
 	@Override
@@ -175,7 +175,7 @@ public class HtmlUnitRequests  extends Request{
 		webClient.getOptions().setJavaScriptEnabled(false);
 		WebRequest webGet=new WebRequest(new URL(url),HttpMethod.GET);
 		setHeader(webGet,headers);
-		return request(webGet,true,decode);
+		return request(webGet,false,decode);
 	}
 	
 	@Override
@@ -195,7 +195,7 @@ public class HtmlUnitRequests  extends Request{
 		WebRequest webPost=new WebRequest(new URL(url),HttpMethod.POST);
 		setHeader(webPost,headers);
 		webPost.setRequestBody(data);
-		return request(webPost,true,decode);
+		return request(webPost,false,decode);
 	}
 	
 	@Override
@@ -223,7 +223,7 @@ public class HtmlUnitRequests  extends Request{
 				hd.add(new NameValuePair(key,item.getString(key)));
 			}
 		}
-		return new Response(hd,new ByteArrayInputStream(content.getBytes("utf-8")),"utf-8",url);
+		return new Response(hd,new ByteArrayInputStream(content.getBytes("utf-8")),"utf-8",url,200);
 	}
 	
 	@Override
@@ -251,7 +251,7 @@ public class HtmlUnitRequests  extends Request{
 				hd.add(new NameValuePair(key,item.getString(key)));
 			}
 		}
-		return new Response(hd,new ByteArrayInputStream(content.getBytes("utf-8")),"utf-8",url);
+		return new Response(hd,new ByteArrayInputStream(content.getBytes("utf-8")),"utf-8",url,200);
 	}
 	
 	public void clearAllCookies(){
@@ -323,13 +323,13 @@ public class HtmlUnitRequests  extends Request{
 		if(renderEnabled){
 			HtmlPage page=webClient.getPage(request);
 			webClient.waitForBackgroundJavaScript(RENDER_TIME);//等待页面渲染时长
-			return new Response(page.getWebResponse().getResponseHeaders(),new ByteArrayInputStream(page.asXml().getBytes("utf-8")),"utf-8",page.getUrl().toString());
+			return new Response(page.getWebResponse().getResponseHeaders(),new ByteArrayInputStream(page.asXml().getBytes("utf-8")),"utf-8",page.getUrl().toString(),page.getWebResponse().getStatusCode());
 		}else{
 			Page page=webClient.getPage(request);
 			if(decode!=null){
-				return new Response(page.getWebResponse().getResponseHeaders(),page.getWebResponse().getContentAsStream(),null,page.getUrl().toString());
+				return new Response(page.getWebResponse().getResponseHeaders(),page.getWebResponse().getContentAsStream(),null,page.getUrl().toString(),page.getWebResponse().getStatusCode());
 			}else{
-				return new Response(page.getWebResponse().getResponseHeaders(),page.getWebResponse().getContentAsStream(),decode,page.getUrl().toString());
+				return new Response(page.getWebResponse().getResponseHeaders(),page.getWebResponse().getContentAsStream(),decode,page.getUrl().toString(),page.getWebResponse().getStatusCode());
 			}
 		}
 	}
@@ -401,6 +401,15 @@ public class HtmlUnitRequests  extends Request{
 	public String getCurrentUrl(){
 		return webClient.getCurrentWindow().getEnclosedPage().getUrl().toString();
 	}
+	
+	/**
+	 * 渲染后的内容
+	 * @return
+	 */
+	public String getContent(){
+		return getHtmlPage().asXml();
+	}
+	
 	
 	/**
 	 * 获得图片

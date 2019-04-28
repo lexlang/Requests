@@ -155,7 +155,7 @@ public class HttpClientRequests  extends Request {
 		}
 		HttpResponse response = httpClient.execute(httpGet);
 		return new Response(turnHsToList(response.getAllHeaders())
-				,response.getEntity().getContent(),decode,url);
+				,response.getEntity().getContent(),decode,url,response.getStatusLine().getStatusCode());
 	}
 	
 	private List<NameValuePair> turnHsToList(Header[] hds){
@@ -168,9 +168,6 @@ public class HttpClientRequests  extends Request {
 		
 		return headers;
 	};
-	
-
-	
 	
 	@Override
 	public Response post(String url, String data) throws ClientProtocolException, IOException, URISyntaxException{
@@ -202,7 +199,7 @@ public class HttpClientRequests  extends Request {
 		
 		HttpResponse response = httpClient.execute(httpPost);
 		
-		return new Response(turnHsToList(response.getAllHeaders()),response.getEntity().getContent(),decode,url);
+		return new Response(turnHsToList(response.getAllHeaders()),response.getEntity().getContent(),decode,url,response.getStatusLine().getStatusCode());
 	}
 	
 	@Override
@@ -236,7 +233,7 @@ public class HttpClientRequests  extends Request {
 		}
 		HttpResponse response = httpClient.execute(httpGet);
 		
-		return new Response(turnHsToList(response.getAllHeaders()),response.getEntity().getContent(),decode,url);
+		return new Response(turnHsToList(response.getAllHeaders()),response.getEntity().getContent(),decode,url,response.getStatusLine().getStatusCode());
 	}
 	
 	@Override
@@ -278,7 +275,7 @@ public class HttpClientRequests  extends Request {
 		
 		HttpResponse response = httpClient.execute(httpPost);
 		
-		return new Response(turnHsToList(response.getAllHeaders()),response.getEntity().getContent(),decode,url);
+		return new Response(turnHsToList(response.getAllHeaders()),response.getEntity().getContent(),decode,url,response.getStatusLine().getStatusCode());
 	}
 	
 	/**
@@ -327,7 +324,7 @@ public class HttpClientRequests  extends Request {
 		httpPost.setEntity(build.build());
 	   
 		HttpResponse response = httpClient.execute(httpPost);
-		return new Response(turnHsToList(response.getAllHeaders()),response.getEntity().getContent(),decode,url);
+		return new Response(turnHsToList(response.getAllHeaders()),response.getEntity().getContent(),decode,url,response.getStatusLine().getStatusCode());
 	}
 	
 	

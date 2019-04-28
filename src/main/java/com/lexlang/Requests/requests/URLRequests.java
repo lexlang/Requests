@@ -2,6 +2,7 @@ package com.lexlang.Requests.requests;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.URL;
@@ -14,6 +15,7 @@ import java.util.Set;
 import com.gargoylesoftware.htmlunit.util.NameValuePair;
 import com.lexlang.Requests.proxy.ProxyPara;
 import com.lexlang.Requests.responses.Response;
+import com.lexlang.Requests.util.HsToList;
 
 
 /**
@@ -83,12 +85,12 @@ public class URLRequests extends Request{
 
 	@Override
 	public Response getUseHeaderAndDecode(String url, Map<String, String> headers, String decode) throws IOException {
-		URLConnection connection = getConnection(url,headers);
+		HttpURLConnection connection = (HttpURLConnection) getConnection(url,headers);
         // 建立实际的连接
         connection.connect();
         // 获取所有响应头字段
         Map<String, List<String>> map = connection.getHeaderFields();
-        return new Response(turnHsToList(map),connection.getInputStream(),decode,url);
+        return new Response(HsToList.turnHsToList(map),connection.getInputStream(),decode,url,connection.getResponseCode());
 	}
 
 	@Override
@@ -103,7 +105,7 @@ public class URLRequests extends Request{
 
 	@Override
 	public Response postUseHeaderAndDecode(String url, String data, Map<String, String> headers, String decode) throws IOException {
-		URLConnection conn = getConnection(url,headers);
+		HttpURLConnection conn = (HttpURLConnection) getConnection(url,headers);
 		// 发送POST请求必须设置如下两行
 		conn.setDoOutput(true);
 		conn.setDoInput(true);
@@ -114,20 +116,10 @@ public class URLRequests extends Request{
         // flush输出流的缓冲
         out.flush();
         Map<String, List<String>> map = conn.getHeaderFields();
-        return new Response(turnHsToList(map),conn.getInputStream(),decode,url);
+        return new Response(HsToList.turnHsToList(map),conn.getInputStream(),decode,url,conn.getResponseCode());
 	}
 	
-	private List<NameValuePair> turnHsToList(Map<String, List<String>> map){
-		List<NameValuePair> headers=new ArrayList<NameValuePair>();
-		Set<String> keys = map.keySet();
-		for(String key:keys){
-			List<String> list = map.get(key);
-			for(int index=0;index<list.size();index++){
-				headers.add(new NameValuePair(key,list.get(index)));
-			}
-		}
-		return headers;
-	};
+
 	
 	private URLConnection getConnection(String url,Map<String,String> headers) throws IOException{
         URL realUrl = new URL(url);

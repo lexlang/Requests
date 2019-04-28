@@ -40,13 +40,13 @@ public class Response {
 	
 	//要不要添加
 	private int statusCode;
-	private String protocolVersion;
 	
-	public Response(List<NameValuePair> headers, InputStream inputStream, String decode,String currentUrl) {
+	public Response(List<NameValuePair> headers, InputStream inputStream, String decode,String currentUrl,int statusCode) {
 		this.headers=headers;
 		try {this.baos = getByteStream(inputStream);} catch (IOException e) {System.out.println("流转换发生错误");}
 		this.currentUrl=currentUrl;
 		this.decode=decode;
+		this.statusCode=statusCode;
 	}
 	
 	
@@ -83,12 +83,12 @@ public class Response {
         return result;
 	}
 	
+	/**
+	 * 返回状态码
+	 * @return
+	 */
 	public int getStatusCode(){
 		return statusCode;
-	}
-	
-	public String getProtocolVersion(){
-		return protocolVersion;
 	}
 	
 	/**

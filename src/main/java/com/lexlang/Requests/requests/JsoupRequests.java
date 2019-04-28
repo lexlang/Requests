@@ -16,6 +16,7 @@ import org.jsoup.nodes.Document;
 import com.gargoylesoftware.htmlunit.util.NameValuePair;
 import com.lexlang.Requests.proxy.ProxyPara;
 import com.lexlang.Requests.responses.Response;
+import com.lexlang.Requests.util.HsToList;
 
 /**
 * @author lexlang
@@ -56,19 +57,19 @@ public class JsoupRequests extends Request {
 	@Override
 	public Response get(String url) throws IOException{
 		org.jsoup.Connection.Response resp=getResp(url, null);
-		return new Response(turnHsToList(resp.headers()),new ByteArrayInputStream(resp.body().getBytes("utf-8")),"utf-8",url);
+		return new Response(HsToList.turnHsToList(resp.multiHeaders()),new ByteArrayInputStream(resp.body().getBytes("utf-8")),"utf-8",url,resp.statusCode());
 	}
 
 	@Override
 	public Response getUseHeader(String url, Map<String, String> headers) throws IOException{
 		org.jsoup.Connection.Response resp=getResp(url, headers);
-		return new Response(turnHsToList(resp.headers()),new ByteArrayInputStream(resp.body().getBytes("utf-8")),"utf-8",url);
+		return new Response(HsToList.turnHsToList(resp.multiHeaders()),new ByteArrayInputStream(resp.body().getBytes("utf-8")),"utf-8",url,resp.statusCode());
 	}
 
 	@Override
 	public Response getUseHeaderAndDecode(String url, Map<String, String> headers, String decode) throws IOException{
 		org.jsoup.Connection.Response resp=getResp(url, headers);
-		return new Response(turnHsToList(resp.headers()),new ByteArrayInputStream(resp.bodyAsBytes()),decode,url);
+		return new Response(HsToList.turnHsToList(resp.multiHeaders()),new ByteArrayInputStream(resp.bodyAsBytes()),decode,url,resp.statusCode());
 	}
 	
 	private org.jsoup.Connection.Response getResp(String url, Map<String, String> headers) throws IOException{
@@ -83,32 +84,21 @@ public class JsoupRequests extends Request {
 	@Override
 	public Response post(String url, String data) throws IOException {
 		org.jsoup.Connection.Response resp = postResp(url,data,null);
-		return new Response(turnHsToList(resp.headers()),new ByteArrayInputStream(resp.body().getBytes("utf-8")),"utf-8",url);
+		return new Response(HsToList.turnHsToList(resp.multiHeaders()),new ByteArrayInputStream(resp.body().getBytes("utf-8")),"utf-8",url,resp.statusCode());
 	}
 
 	@Override
 	public Response postUseHeader(String url, String data, Map<String, String> headers) throws IOException {
 		org.jsoup.Connection.Response resp = postResp(url,data,headers);
-		return new Response(turnHsToList(resp.headers()),new ByteArrayInputStream(resp.body().getBytes("utf-8")),"utf-8",url);
+		return new Response(HsToList.turnHsToList(resp.multiHeaders()),new ByteArrayInputStream(resp.body().getBytes("utf-8")),"utf-8",url,resp.statusCode());
 	}
 
 	@Override
 	public Response postUseHeaderAndDecode(String url, String data, Map<String, String> headers, String decode) throws IOException{
 		org.jsoup.Connection.Response resp = postResp(url,data,headers);
-		return new Response(turnHsToList(resp.headers()),new ByteArrayInputStream(resp.bodyAsBytes()),decode,url);
+		return new Response(HsToList.turnHsToList(resp.multiHeaders()),new ByteArrayInputStream(resp.bodyAsBytes()),decode,url,resp.statusCode());
 	}
 	
-	
-	private List<NameValuePair> turnHsToList(Map<String, String> hds){
-		List<NameValuePair> headers=new ArrayList<NameValuePair>();
-		
-		Set<String> keys = hds.keySet();
-		for(String key:keys){
-			headers.add(new NameValuePair(key,hds.get(key)));
-		}
-
-		return headers;
-	};
 	
 	private org.jsoup.Connection.Response postResp(String url, String data,Map<String, String> headers) throws IOException{
 		Connection con=getConnection(url,headers).followRedirects(true).method(Method.POST);
