@@ -4,7 +4,7 @@
 
   <groupId>com.lexlang</groupId>
   <artifactId>Requests</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.1.1</version>
   <packaging>jar</packaging>
 
   <name>Requests</name>
@@ -37,12 +37,12 @@
 	    <version>1.2.47</version>
 	</dependency>
 	
-	    <!-- https://mvnrepository.com/artifact/org.jsoup/jsoup -->
+	<!-- https://mvnrepository.com/artifact/org.jsoup/jsoup -->
 	<dependency>
 	    <groupId>org.jsoup</groupId>
 	    <artifactId>jsoup</artifactId>
 	    <version>1.11.3</version>
 	</dependency>
-    
+	
   </dependencies>
 </project>
