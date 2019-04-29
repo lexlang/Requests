@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -205,14 +206,16 @@ public class Response {
     /**
      * \uFFFF编码转程字符串
      * @return
+     * @throws UnsupportedEncodingException 
+     * @throws Exception 
      */
-    public String getUnicode2String(){
+    public String getUnicode2String() throws UnsupportedEncodingException{
     	String result=getContent();
         Matcher m = Pattern.compile("\\\\u\\w{4}").matcher(getContent());
         while(m.find()){
         	result=result.replace(m.group(),""+(char) Integer.parseInt(m.group().replace("\\u", ""), 16));
         }
-        return result;
+        return turn16(result);
     }
     
     /**
@@ -281,5 +284,41 @@ public class Response {
         }  
         return false;  
     } 
+    
+    /**
+     * 十六进制转成文本
+     * @param content
+     * @return
+     * @throws UnsupportedEncodingException 
+     * @throws Exception
+     */
+	public String turn16(String content) throws UnsupportedEncodingException {
+		Matcher m = Pattern.compile("\\\\x.{2}").matcher(content);
+		while(m.find()){
+			String xx=m.group();
+			content=content.replace(xx, fromHexString(xx.replace("\\x", "")));
+		}
+		return content;
+	}
 
+	public  String fromHexString(String hexString) throws UnsupportedEncodingException{
+	    // 用于接收转换结果
+	    String result = "";
+	    // 转大写
+	    hexString = hexString.toUpperCase();
+	    // 16进制字符
+	    String hexDigital = "0123456789ABCDEF";
+	    // 将16进制字符串转换成char数组
+	    char[] hexs = hexString.toCharArray();
+	    // 能被16整除，肯定可以被2整除
+	    byte[] bytes = new byte[hexString.length() / 2];
+	    int n;
+	     
+	    for (int i = 0; i < bytes.length; i++) {
+	        n = hexDigital.indexOf(hexs[2 * i]) * 16 + hexDigital.indexOf(hexs[2 * i + 1]);
+	        bytes[i] = (byte) (n & 0xff);
+	    }
+	    return new String(bytes, "UTF-8");
+	}
+    
 }
