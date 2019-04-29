@@ -42,45 +42,45 @@ Map<String, String> hds = HeaderConfig.postBuilder().setReferer("http://www.baid
 Intercept拦截器,功能拦截请求和响应,修改响应或者存储响应
 1.比如,使用htmlunit访问一个页面,需要渲染,每次请求时都会请求对应的js文件和图片,可以把js文件和图片缓存到本地,下次访问直接拿本地缓存,加快渲染速度,覆写storeResponseOrNot,下列缓存js和css
 ```Java
-	new Intercept(requests.getWetClient()){
-    		@Override
-    	    public boolean storeResponseOrNot(String url){
-    			if(url.endsWith(".js") || url.startsWith(".css")){
-    				return true;
-    			}else{
-    				return false;
-    			}
-    	    }
-    	};
+new Intercept(requests.getWetClient()){
+	@Override
+    public boolean storeResponseOrNot(String url){
+		if(url.endsWith(".js") || url.startsWith(".css")){
+			return true;
+		}else{
+			return false;
+		}
+    }
+};
 ```
 2.使用htmlunit访问一个页面,修改页面dom,屏蔽反爬措施或者修剪页面,覆写modifyResponseOrNot修改链接符合条件,覆写modifyResponse修改内容
 ```Java
-	new Intercept(requests.getWetClient()){
-    		@Override
-    	    public boolean modifyResponseOrNot(String url){
-    	    	return url.matches(".+getCar.+");
-    	    }
-    	    @Override
-    	    public WebResponse modifyResponse(WebResponse response) throws IOException{
-    	    	String html=response.getContentAsString();
-    	    	return makeResponse(response,html.replaceAll("[u4e00-u9fa5]", ""));
-    	    }
-    	   };
+new Intercept(requests.getWetClient()){
+	@Override
+    public boolean modifyResponseOrNot(String url){
+    	return url.matches(".+getCar.+");
+    }
+    @Override
+    public WebResponse modifyResponse(WebResponse response) throws IOException{
+    	String html=response.getContentAsString();
+    	return makeResponse(response,html.replaceAll("[u4e00-u9fa5]", ""));
+    }
+};
 ```
 3.使用htmlunit访问一个页面,页面可能加载了百度指数,对采集没有任何帮助的请求可以屏蔽掉,覆写rejectResponseOrNot,下面屏蔽google指数
 ```Java
-	HtmlUnitRequests requests=new HtmlUnitRequests();
-    	new Intercept(requests.getWetClient()){
-    		@Override
-    	    public boolean rejectResponseOrNot(String url){
-    	    	return url.contains("www.google-analytics.com/analytics");
-    	    }
-    	};
+HtmlUnitRequests requests=new HtmlUnitRequests();
+	new Intercept(requests.getWetClient()){
+		@Override
+	    public boolean rejectResponseOrNot(String url){
+	    	return url.contains("www.google-analytics.com/analytics");
+	    }
+};
 ```
 * 使用java执行js,把js传入JavaScript对象中,然后调用invokeFunction函数
 ```Java
-    	JavaScript js=new JavaScript("function add(a,b){return a+b;}");
-    	String result=js.invokeFunction("add", 1,2);
+JavaScript js=new JavaScript("function add(a,b){return a+b;}");
+String result=js.invokeFunction("add", 1,2);
 ```
 * SpiderUserAgent类集成了常见的UA头
 * htmlunit特殊方法介绍
