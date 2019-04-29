@@ -40,7 +40,7 @@ HeaderConfig工具生成消息头
 Map<String, String> hds = HeaderConfig.postBuilder().setReferer("http://www.baidu.com").build();
 ```
 Intercept拦截器,功能拦截请求和响应,修改响应或者存储响应
->>>>1.比如,使用htmlunit访问一个页面,需要渲染,每次请求时都会请求对应的js文件和图片,可以把js文件和图片缓存到本地,下次访问直接拿本地缓存,加快渲染速度,覆写storeResponseOrNot,下列缓存js和css
+1.比如,使用htmlunit访问一个页面,需要渲染,每次请求时都会请求对应的js文件和图片,可以把js文件和图片缓存到本地,下次访问直接拿本地缓存,加快渲染速度,覆写storeResponseOrNot,下列缓存js和css
 ```Java
 	new Intercept(requests.getWetClient()){
     		@Override
@@ -77,12 +77,12 @@ Intercept拦截器,功能拦截请求和响应,修改响应或者存储响应
     	    }
     	};
 ```
-*使用java执行js,把js传入JavaScript对象中,然后调用invokeFunction函数
+* 使用java执行js,把js传入JavaScript对象中,然后调用invokeFunction函数
 ```Java
     	JavaScript js=new JavaScript("function add(a,b){return a+b;}");
     	String result=js.invokeFunction("add", 1,2);
 ```
-*SpiderUserAgent类集成了常见的UA头
+* SpiderUserAgent类集成了常见的UA头
 * htmlunit特殊方法介绍
 ```Java
 executeJavaScript();// 执行js代码 例如：executeJavaScript("document.querySelector(\"a[href*='detail']\").click();"),点击属性href包含datail的a标签
