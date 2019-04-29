@@ -1,13 +1,11 @@
 # Requests
-
 ## 简介
-
->本工具参照<u>python</u>中requests,对java的工具进行封装,使其使用相对统一,封装的工具有URL,<u>Jsoup</u>,HttpClient,HtmlUnit
-
+本工具参照<u>python</u>中requests,对java的工具进行封装,使其使用相对统一,封装的工具有URL,<u>Jsoup</u>,HttpClient,HtmlUnit
 ## 使用方法
-
 * 构造浏览器对象,需要调用的基础对象 加 Requests,例如调用htmlunit工具,就用HtmlUnitRequests.调用HttpClient工具,就用HttpClientRequests.以此类推:
->>HtmlUnitRequests requests = new HtmlUnitRequests();
+```Java
+HtmlUnitRequests requests = new HtmlUnitRequests();
+```
 * 构造器可以传入参数有超时时间和代理ip
 >>HtmlUnitRequests requests = new HtmlUnitRequests(5000);//5秒钟超时
 >>HtmlUnitRequests requests = new HtmlUnitRequests(new ProxyPara("127.0.0.1",12345));//设置代理
