@@ -38,6 +38,10 @@ public class Intercept extends FalsifyingWebConnection{
     public WebResponse getResponse(WebRequest request) throws IOException {
     	String url=request.getUrl().toString();
     	
+    	if(rejectResponseOrNot(url)){
+    		return null;
+    	}
+    	
     	if(responseStore.containsKey(url)){
     		return responseStore.get(url);
     	}else{
@@ -51,6 +55,15 @@ public class Intercept extends FalsifyingWebConnection{
             	return response;
             }
     	}
+    }
+    
+    /**
+     * 屏蔽指定链接
+     * @param url
+     * @return
+     */
+    public boolean rejectResponseOrNot(String url){
+    	return false;
     }
     
     /**
@@ -76,7 +89,7 @@ public class Intercept extends FalsifyingWebConnection{
      * @param response
      * @return
      */
-    public WebResponse modifyResponse(WebResponse response){
+    public WebResponse modifyResponse(WebResponse response) throws IOException{
     	//String html=response.getContentAsString();
     	return response;
     }
