@@ -41,7 +41,11 @@ import com.gargoylesoftware.htmlunit.WebRequest;
 import com.gargoylesoftware.htmlunit.WebWindow;
 import com.gargoylesoftware.htmlunit.BrowserVersion.BrowserVersionBuilder;
 import com.gargoylesoftware.htmlunit.html.DomElement;
+import com.gargoylesoftware.htmlunit.html.DomNode;
+import com.gargoylesoftware.htmlunit.html.FrameWindow;
+import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlImage;
+import com.gargoylesoftware.htmlunit.html.HtmlInput;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.util.Cookie;
 import com.gargoylesoftware.htmlunit.util.KeyDataPair;
@@ -478,6 +482,32 @@ public class HtmlUnitRequests  extends Request{
 	}
 	
 	/**
+	 * 设置对应选择器内容
+	 * @param cssSelector
+	 * @param sendKeys
+	 */
+	public void sendKeysToInput(String cssSelector,String sendKeys){
+		HtmlInput input = getHtmlPage().querySelector(cssSelector);
+		input.setValueAttribute(sendKeys);
+	}
+	
+	/**
+	 * 切换iframe
+	 * @param match
+	 * @return
+	 */
+	public HtmlPage switchToFrame(String match){
+		List<FrameWindow> frames = getHtmlPage().getFrames();
+		for(int index=0;index<frames.size();index++){
+			FrameWindow win = frames.get(index);
+			if(win.getEnclosedPage().getUrl().toString().matches(match)){
+				return (HtmlPage) win.getEnclosedPage();
+			}
+		}
+		return null;
+	}
+	
+	/**
 	 * 切换页面,不关闭其他页面
 	 * @param match 切换链接符合这个正则
 	 */
@@ -519,6 +549,7 @@ public class HtmlUnitRequests  extends Request{
 			}
 		}
 	}
+	
 	
 	/**
 	 * 检查是否是顶级窗口

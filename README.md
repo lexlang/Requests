@@ -95,4 +95,6 @@ utilShowUp();// 等待某元素出现
 switchToWindow();// 执行点击后,浏览器会打开多个窗口，切换到符合对应正则的窗口
 switchToWindowCloseOthers();// 关闭除符合正则所有窗口,并切换到对应窗口
 setJavaScriptEnabled();// 是否执行js
+sendKeysToInput();//填写关键词
+switchToFrame();//iframe切换
 ```
