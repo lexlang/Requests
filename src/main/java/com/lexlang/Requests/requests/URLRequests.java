@@ -109,6 +109,10 @@ public class URLRequests extends Request{
 		HttpURLConnection conn = (HttpURLConnection) getConnection(url,headers);
 		conn.setRequestMethod("POST"); 
 		
+		if(headers==null){
+			conn.setRequestProperty("Content-type", "application/x-www-form-urlencoded");
+		}
+		
 		// 发送POST请求必须设置如下两行
 		conn.setDoOutput(true);
 		conn.setDoInput(true);

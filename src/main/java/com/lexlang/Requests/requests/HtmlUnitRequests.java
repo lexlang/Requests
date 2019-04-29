@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -155,6 +156,9 @@ public class HtmlUnitRequests  extends Request{
 		webClient.getOptions().setJavaScriptEnabled(true);
 		WebRequest webPost=new WebRequest(new URL(url),HttpMethod.POST);
 		setHeader(webPost,headers);
+		if(headers==null){
+			webPost.setAdditionalHeader("Content-type", "application/x-www-form-urlencoded");
+		}
 		webPost.setRequestBody(data);
 		return request(webPost,decode);
 	}
@@ -194,6 +198,9 @@ public class HtmlUnitRequests  extends Request{
 		webClient.getOptions().setJavaScriptEnabled(false);
 		WebRequest webPost=new WebRequest(new URL(url),HttpMethod.POST);
 		setHeader(webPost,headers);
+		if(headers==null){
+			webPost.setAdditionalHeader("Content-type", "application/x-www-form-urlencoded");
+		}
 		webPost.setRequestBody(data);
 		return request(webPost,decode);
 	}

@@ -111,6 +111,9 @@ public class JsoupRequests extends Request {
 		Connection con=getConnection(url,headers)
 				.followRedirects(true)
 				.method(Method.POST);
+		if(headers==null){
+			con.header("Content-type", "application/x-www-form-urlencoded");
+		}
 		con.requestBody(data);
 		org.jsoup.Connection.Response resp = con.execute();
 		return resp;
