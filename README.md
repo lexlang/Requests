@@ -39,7 +39,7 @@ HeaderConfig工具生成消息头
 ```Java
 Map<String, String> hds = HeaderConfig.postBuilder().setReferer("http://www.baidu.com").build();
 ```
-Intercept拦截器,功能拦截请求和响应,修改响应或者存储响应<br>
+* Intercept拦截器,功能拦截请求和响应,修改响应或者存储响应<br>
 1.比如,使用htmlunit访问一个页面,需要渲染,每次请求时都会请求对应的js文件和图片,可以把js文件和图片缓存到本地,下次访问直接拿本地缓存,加快渲染速度,覆写storeResponseOrNot,下列缓存js和css
 ```Java
 new Intercept(requests.getWetClient()){
