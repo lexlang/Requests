@@ -73,7 +73,7 @@ public class JsoupRequests extends Request {
 	}
 	
 	private org.jsoup.Connection.Response getResp(String url, Map<String, String> headers) throws IOException{
-		Connection con=getConnection(url,headers)
+		Connection con=getConnection(url,headers).ignoreContentType(true)
 						.followRedirects(true)
 						.method(Method.GET);
 		org.jsoup.Connection.Response resp = con.execute();
@@ -108,7 +108,7 @@ public class JsoupRequests extends Request {
 	 * @throws IOException
 	 */
 	private org.jsoup.Connection.Response postResp(String url, String data,Map<String, String> headers) throws IOException{
-		Connection con=getConnection(url,headers)
+		Connection con=getConnection(url,headers).ignoreContentType(true)
 				.followRedirects(true)
 				.method(Method.POST);
 		if(headers==null){
