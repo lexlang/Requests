@@ -195,7 +195,11 @@ public class HttpClientRequests  extends Request {
 		}
 		
 		//添加实体
-		httpPost.setEntity(new StringEntity(data,"utf-8"));
+		if(headers.get("Content-Type").contains("application/json")){
+			httpPost.setEntity(new StringEntity(data,"utf-8"));
+		}else{
+			httpPost.setEntity(new StringEntity(data));
+		}
 		
 		HttpResponse response = httpClient.execute(httpPost);
 		
