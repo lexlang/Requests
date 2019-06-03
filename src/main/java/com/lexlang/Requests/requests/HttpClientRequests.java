@@ -195,7 +195,7 @@ public class HttpClientRequests  extends Request {
 		}
 		
 		//添加实体
-		httpPost.setEntity(new StringEntity(data));
+		httpPost.setEntity(new StringEntity(data,"utf-8"));
 		
 		HttpResponse response = httpClient.execute(httpPost);
 		
