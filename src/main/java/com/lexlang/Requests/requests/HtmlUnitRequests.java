@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.imageio.ImageReader;
 import javax.xml.parsers.ParserConfigurationException;
@@ -63,8 +62,8 @@ import com.lexlang.Requests.util.UrlUtils;
 */
 public class HtmlUnitRequests  extends Request{
 	static{
-		   Logger htmlunilLogger = Logger.getLogger("com.gargoylesoftware.htmlunit");
-	       htmlunilLogger.setLevel(Level.OFF);
+		java.util.logging.Logger.getLogger("com.gargoylesoftware").setLevel(Level.OFF); 
+		java.util.logging.Logger.getLogger("org.apache.http.client").setLevel(Level.OFF);
 	 }
 	
 	private static final int RENDER_TIME=2000;//默认渲染时长
@@ -137,7 +136,6 @@ public class HtmlUnitRequests  extends Request{
 	@Override
 	public Response getUseHeaderAndDecode(String url, Map<String, String> headers, String decode) throws Exception {
 		webClient.getOptions().setRedirectEnabled(true);
-		webClient.getOptions().setJavaScriptEnabled(true);
 		WebRequest webGet=new WebRequest(new URL(url),HttpMethod.GET);
 		setHeader(webGet,headers);
 		return request(webGet,decode);
@@ -157,7 +155,6 @@ public class HtmlUnitRequests  extends Request{
 	public Response postUseHeaderAndDecode(String url, String data, Map<String, String> headers, String decode)
 			throws Exception {
 		webClient.getOptions().setRedirectEnabled(true);
-		webClient.getOptions().setJavaScriptEnabled(true);
 		WebRequest webPost=new WebRequest(new URL(url),HttpMethod.POST);
 		setHeader(webPost,headers);
 		if(headers==null){
@@ -180,7 +177,6 @@ public class HtmlUnitRequests  extends Request{
 	@Override
 	public Response getUseHeaderAndDecodeNoRedirect(String url,Map<String,String> headers,String decode) throws Exception{
 		webClient.getOptions().setRedirectEnabled(false);
-		webClient.getOptions().setJavaScriptEnabled(false);
 		WebRequest webGet=new WebRequest(new URL(url),HttpMethod.GET);
 		setHeader(webGet,headers);
 		return request(webGet,decode);
@@ -199,7 +195,6 @@ public class HtmlUnitRequests  extends Request{
 	@Override
 	public Response postUseHeaderAndDecodeNoRedirect(String url,String data,Map<String,String> headers,String decode) throws Exception{
 		webClient.getOptions().setRedirectEnabled(false);
-		webClient.getOptions().setJavaScriptEnabled(false);
 		WebRequest webPost=new WebRequest(new URL(url),HttpMethod.POST);
 		setHeader(webPost,headers);
 		if(headers==null){
