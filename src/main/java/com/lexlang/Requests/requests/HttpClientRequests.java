@@ -28,6 +28,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.config.RequestConfig.Builder;
 import org.apache.http.client.methods.HttpGet;
@@ -102,6 +103,7 @@ public class HttpClientRequests  extends Request {
 		configBuilder.setConnectTimeout(timeout);
 		configBuilder.setSocketTimeout(timeout);
 		configBuilder.setConnectionRequestTimeout(timeout);
+		configBuilder.setCookieSpec(CookieSpecs.STANDARD);
 		
 		if(proxy!=null){
 			setProxy(configBuilder,proxy);
@@ -112,7 +114,9 @@ public class HttpClientRequests  extends Request {
 		cookieStore = new BasicCookieStore();
 		try {
 			httpClient = HttpClients.custom().setSSLContext(createIgnoreVerifySSL())
-					.setConnectionManager(connMgr).setDefaultRequestConfig(requestConfig).setDefaultCookieStore(cookieStore).build();
+											.setConnectionManager(connMgr)
+											.setDefaultRequestConfig(requestConfig)
+											.setDefaultCookieStore(cookieStore).build();
 		} catch (KeyManagementException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
