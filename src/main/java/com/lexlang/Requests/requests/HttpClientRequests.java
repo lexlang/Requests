@@ -149,7 +149,7 @@ public class HttpClientRequests  extends Request {
 	}
 
 	@Override
-	public Response getUseHeaderAndDecode(String url, Map<String, String> headers, String decode) throws URISyntaxException, ClientProtocolException, IOException {
+	public Response getUseHeaderAndDecode(String url, Map<String, String> headers, String decode) throws URISyntaxException {
 		HttpGet httpGet=new HttpGet();
 		httpGet.setURI(new URI(url));
 		if(headers!=null){
@@ -158,9 +158,17 @@ public class HttpClientRequests  extends Request {
 				httpGet.setHeader(key, headers.get(key));
 			}
 		}
-		HttpResponse response = httpClient.execute(httpGet);
-		return new Response(turnHsToList(response.getAllHeaders())
-				,response.getEntity().getContent(),decode,url,response.getStatusLine().getStatusCode());
+		Response resp =null;
+		try{
+			HttpResponse response = httpClient.execute(httpGet);
+			resp = new Response(turnHsToList(response.getAllHeaders())
+					,response.getEntity().getContent(),decode,url,response.getStatusLine().getStatusCode());
+		}catch(Exception ex){
+			throw new RuntimeException("采集异常");
+		}finally {
+			httpGet.releaseConnection();
+		}
+		return resp;
 	}
 	
 	private List<NameValuePair> turnHsToList(Header[] hds){
@@ -185,7 +193,7 @@ public class HttpClientRequests  extends Request {
 	}
 
 	@Override
-	public Response postUseHeaderAndDecode(String url, String data, Map<String, String> headers, String decode) throws ClientProtocolException, IOException, URISyntaxException {
+	public Response postUseHeaderAndDecode(String url, String data, Map<String, String> headers, String decode) throws URISyntaxException, UnsupportedEncodingException {
 		HttpPost httpPost=new HttpPost();
 		httpPost.setURI(new URI(url));
 		if(headers!=null){
@@ -205,27 +213,36 @@ public class HttpClientRequests  extends Request {
 			httpPost.setEntity(new StringEntity(data));
 		}
 		
-		HttpResponse response = httpClient.execute(httpPost);
-		
-		//手工跳转
-		if(response.getStatusLine().getStatusCode()==301 || response.getStatusLine().getStatusCode()==302){
-			Header[] hds = response.getAllHeaders();
-			String location="";
-			for(int index=0;index<hds.length;index++){
-				Header item = hds[index];
-				if(item.getName().equals("Location")){
-					location=item.getValue();
-					break;
+		Response resp = null;
+		try{
+			HttpResponse response = httpClient.execute(httpPost);
+			
+			//手工跳转
+			if(response.getStatusLine().getStatusCode()==301 || response.getStatusLine().getStatusCode()==302){
+				Header[] hds = response.getAllHeaders();
+				String location="";
+				for(int index=0;index<hds.length;index++){
+					Header item = hds[index];
+					if(item.getName().equals("Location")){
+						location=item.getValue();
+						break;
+					}
+				}
+				if(location.length()>0){
+					return get(UrlUtils.canonicalizeUrl(location, url));
+				}else{
+					new RuntimeException("statuscode为301或302未找到,对应的location");
 				}
 			}
-			if(location.length()>0){
-				return get(UrlUtils.canonicalizeUrl(location, url));
-			}else{
-				new RuntimeException("statuscode为301或302未找到,对应的location");
-			}
+			
+			resp = new Response(turnHsToList(response.getAllHeaders()),response.getEntity().getContent(),decode,url,response.getStatusLine().getStatusCode());
+		}catch(Exception ex){
+			throw new RuntimeException("采集异常");
+		}finally {
+			httpPost.releaseConnection();
 		}
 		
-		return new Response(turnHsToList(response.getAllHeaders()),response.getEntity().getContent(),decode,url,response.getStatusLine().getStatusCode());
+		return resp;
 	}
 	
 	@Override
@@ -239,7 +256,7 @@ public class HttpClientRequests  extends Request {
 	}
 	
 	@Override
-	public Response getUseHeaderAndDecodeNoRedirect(String url,Map<String,String> headers,String decode) throws URISyntaxException, ClientProtocolException, IOException {
+	public Response getUseHeaderAndDecodeNoRedirect(String url,Map<String,String> headers,String decode) throws URISyntaxException{
 		HttpGet httpGet=new HttpGet();
 		httpGet.setURI(new URI(url));
 		
@@ -257,9 +274,17 @@ public class HttpClientRequests  extends Request {
 				httpGet.setHeader(key, headers.get(key));
 			}
 		}
-		HttpResponse response = httpClient.execute(httpGet);
 		
-		return new Response(turnHsToList(response.getAllHeaders()),response.getEntity().getContent(),decode,url,response.getStatusLine().getStatusCode());
+		Response resp = null;
+		try{
+			HttpResponse response = httpClient.execute(httpGet);
+			resp = new Response(turnHsToList(response.getAllHeaders()),response.getEntity().getContent(),decode,url,response.getStatusLine().getStatusCode());
+		}catch(Exception ex){
+			throw new RuntimeException("采集异常");
+		}finally {
+			httpGet.releaseConnection();
+		}
+		return resp;
 	}
 	
 	@Override
@@ -296,12 +321,19 @@ public class HttpClientRequests  extends Request {
 			httpPost.setHeader("content-type", "application/x-www-form-urlencoded");
 		}
 		
-		//添加实体
-		httpPost.setEntity(new StringEntity(data));
-		
-		HttpResponse response = httpClient.execute(httpPost);
-		
-		return new Response(turnHsToList(response.getAllHeaders()),response.getEntity().getContent(),decode,url,response.getStatusLine().getStatusCode());
+		Response resp = null;
+		try{
+			//添加实体
+			httpPost.setEntity(new StringEntity(data));
+			HttpResponse response = httpClient.execute(httpPost);
+			resp = new Response(turnHsToList(response.getAllHeaders()),response.getEntity().getContent(),decode,url,response.getStatusLine().getStatusCode());
+		}catch(Exception ex){
+			throw new RuntimeException("采集异常");
+		}finally {
+			httpPost.releaseConnection();
+		}
+
+		return resp;
 	}
 		
     /** 
