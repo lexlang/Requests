@@ -121,7 +121,9 @@ public class Response {
 				String[] decs={"utf-8","gbk","gb2312"};
 				for(String dec:decs){
 					String con=inputStream2String(new ByteArrayInputStream(baos.toByteArray()), dec);
-					if(! isMessyCode(con)){
+					if(! isMessyCode(con.replaceAll("[\\pP+~$`^=|<>～｀＄＾＋＝｜＜＞￥×]" , "")
+							.replaceAll("[\\p{P}+~$`^=|<>～｀＄＾＋＝｜＜＞￥×]" , "").replaceAll("[a-zA-Z0-9]", "")
+							.replace(" ","").replace("\r", "").replace("\n", "").replace("\t", ""))){
 						return con;
 					}
 				}
