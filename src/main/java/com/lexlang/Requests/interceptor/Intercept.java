@@ -50,7 +50,7 @@ public class Intercept extends FalsifyingWebConnection{
             	responseStore.put(url, response);
             }
             if(modifyResponseOrNot(url)){
-            	return modifyResponse(response);
+            	return modifyResponse(response,url);
             }else{
             	return response;
             }
@@ -89,7 +89,7 @@ public class Intercept extends FalsifyingWebConnection{
      * @param response
      * @return
      */
-    public WebResponse modifyResponse(WebResponse response) throws IOException{
+    public WebResponse modifyResponse(WebResponse response,String url) throws IOException{
     	//String html=response.getContentAsString();
     	return response;
     }
