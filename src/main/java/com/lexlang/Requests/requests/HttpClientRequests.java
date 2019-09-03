@@ -164,6 +164,7 @@ public class HttpClientRequests  extends Request {
 			resp = new Response(turnHsToList(response.getAllHeaders())
 					,response.getEntity().getContent(),decode,url,response.getStatusLine().getStatusCode());
 		}catch(Exception ex){
+			ex.printStackTrace();
 			throw new RuntimeException("采集异常");
 		}finally {
 			httpGet.releaseConnection();

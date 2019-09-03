@@ -12,6 +12,7 @@ import com.gargoylesoftware.htmlunit.WebResponse;
 import com.gargoylesoftware.htmlunit.WebResponseData;
 import com.gargoylesoftware.htmlunit.util.FalsifyingWebConnection;
 import com.gargoylesoftware.htmlunit.util.NameValuePair;
+import com.lexlang.Requests.proxy.ProxyPara;
 
 /**
 * @author lexlang
@@ -55,6 +56,17 @@ public class Intercept extends FalsifyingWebConnection{
             	return response;
             }
     	}
+    }
+    
+    /**
+     * 添加随机代理,减少代理开支
+     * 重要请求访问,不重要的本地请求
+     * @param request
+     * @param para
+     */
+    public void addProxy(WebRequest request,ProxyPara para){
+    	request.setProxyHost(para.getHost());
+    	request.setProxyPort(para.getPort());
     }
     
     /**
