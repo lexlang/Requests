@@ -1,4 +1,4 @@
-package com.tianluo.CrawlUtils.util;
+package com.lexlang.Requests.util;
 
 import java.util.ArrayList;
 import java.util.HashSet;
