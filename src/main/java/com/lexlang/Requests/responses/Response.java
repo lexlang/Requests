@@ -115,21 +115,31 @@ public class Response {
 	 */
 	public String getContent(){
 		try {
-			if(decode!=null){
-				return inputStream2String(new ByteArrayInputStream(baos.toByteArray()), decode);
-			}else{
-				String[] decs={"utf-8","gbk","gb2312"};
-				for(String dec:decs){
-					String con=inputStream2String(new ByteArrayInputStream(baos.toByteArray()), dec);
-					if(! isMessyCode(con.replaceAll("[\\pP+~$`^=|<>～｀＄＾＋＝｜＜＞￥×]" , "")
-							.replaceAll("[\\p{P}+~$`^=|<>～｀＄＾＋＝｜＜＞￥×]" , "").replaceAll("[a-zA-Z0-9]", "")
-							.replace(" ","").replace("\r", "").replace("\n", "").replace("\t", ""))){
-						return con;
-					}
+			String[] decs={"utf-8","gbk","gb2312"};
+			for(String dec:decs){
+				String con=inputStream2String(new ByteArrayInputStream(baos.toByteArray()), dec);
+				if(! isMessyCode(con.replaceAll("[\\pP+~$`^=|<>～｀＄＾＋＝｜＜＞￥×]" , "")
+						.replaceAll("[\\p{P}+~$`^=|<>～｀＄＾＋＝｜＜＞￥×]" , "").replaceAll("[a-zA-Z0-9]", "")
+						.replace(" ","").replace("\r", "").replace("\n", "").replace("\t", ""))){
+					return con;
 				}
-				return inputStream2String(new ByteArrayInputStream(baos.toByteArray()), "utf-8");
 			}
+			return inputStream2String(new ByteArrayInputStream(baos.toByteArray()), "utf-8");
 		} catch (IOException e) {System.out.println("流转字符串发生错误");}
+		return "";
+	}
+	
+	/**
+	 * 获得response指定编码的文本
+	 * @param decode
+	 * @return
+	 */
+	public String getContent(String decode){
+		try {
+			return inputStream2String(new ByteArrayInputStream(baos.toByteArray()), decode);
+		} catch (IOException e) {
+			System.out.println("流转字符串发生错误");
+		}
 		return "";
 	}
 	
