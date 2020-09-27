@@ -46,6 +46,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlImage;
 import com.gargoylesoftware.htmlunit.html.HtmlInput;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import com.gargoylesoftware.htmlunit.html.HtmlSelect;
 import com.gargoylesoftware.htmlunit.util.Cookie;
 import com.gargoylesoftware.htmlunit.util.KeyDataPair;
 import com.gargoylesoftware.htmlunit.util.NameValuePair;
@@ -485,6 +486,17 @@ public class HtmlUnitRequests  extends Request{
 		HtmlInput input = getHtmlPage().querySelector(cssSelector);
 		input.setValueAttribute(sendKeys);
 	}
+	
+	/**
+	 * htmlselect 选择对应的值
+	 * @param cssSelector
+	 * @param sendKeys
+	 */
+	public void selectKeysToInput(String cssSelector,String sendKeys){
+		HtmlSelect selectCity=getHtmlPage().querySelector(cssSelector);
+		selectCity.setDefaultValue(sendKeys);
+	}
+	
 	
 	/**
 	 * 切换iframe
