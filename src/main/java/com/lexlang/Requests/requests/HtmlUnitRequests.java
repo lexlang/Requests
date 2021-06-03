@@ -117,8 +117,11 @@ public class HtmlUnitRequests  extends Request{
 	/**
 	 * 设置代理
 	 * @param proxyPara
+	 * requests.getWetClient().getOptions().getProxyConfig().setProxyHost(proxy.getHost());
+	 * requests.getWetClient().getOptions().getProxyConfig().setProxyPort(proxy.getPort());
+	 * 
 	 */
-	private void setProxy(ProxyPara proxyPara){
+	public void setProxy(ProxyPara proxyPara){
 		ProxyConfig proxyConfig = this.webClient.getOptions().getProxyConfig();
 		proxyConfig.setProxyHost(proxyPara.getHost());
 		proxyConfig.setProxyPort(proxyPara.getPort());
